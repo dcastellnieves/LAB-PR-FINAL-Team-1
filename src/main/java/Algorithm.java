@@ -131,12 +131,18 @@ public class Algorithm {
 		if(!nodes.isEmpty()) {
 			Node leastH = nodes.get(0);
 			for(int i = 1; i < nodes.size();i++) {
-				double f1 = Node.distance(nodes.get(i), end);
-				double h1 = Node.distance(nodes.get(i), start);
-						
-				double f2 = Node.distance(leastH, end);
-				double h2 = Node.distance(leastH, start);
-				if(f1 + h1 < f2 + h2) {
+				// h-cost: heuristic distance to end
+				double h1 = Node.distance(nodes.get(i), end);
+				// g-cost: actual distance from start
+				double g1 = nodes.get(i).getgCost();
+				
+				// h-cost: heuristic distance to end
+				double h2 = Node.distance(leastH, end);
+				// g-cost: actual distance from start
+				double g2 = leastH.getgCost();
+				
+				// f = g + h
+				if(g1 + h1 < g2 + h2) {
 					leastH = nodes.get(i);
 				}
 			}
@@ -180,6 +186,9 @@ public class Algorithm {
 	public void Astar(Node start, Node targetNode,  int graphWidth, int graphHeight) {
 		List<Node> openList = new ArrayList<Node>();
 		Node[][] prev = new Node[graphWidth][graphHeight];
+		
+		// Initialize g-cost for start node
+		start.setgCost(0);
 		openList.add(start);
 		
 		while(!openList.isEmpty()) {
@@ -202,14 +211,14 @@ public class Algorithm {
 				if(adjacent.isSearched()) {
 					continue;
 				}
-				double f1 = Node.distance(adjacent, targetNode);
-				double h1 = Node.distance(curNode, start);
-						
-				double f2 = Node.distance(adjacent, targetNode);
-				double h2 = Node.distance(curNode, start);
 				
-				if(!openList.contains(adjacent) || (f1 + h1 < f2 + h2)) {
+				// Calculate g-cost: actual distance from start to adjacent through current node
+				double tentativeGCost = curNode.getgCost() + Node.distance(curNode, adjacent);
+				
+				// If this path to adjacent is better than any previous one, or adjacent is not in openList
+				if(!openList.contains(adjacent) || tentativeGCost < adjacent.getgCost()) {
 					prev[adjacent.getX()][adjacent.getY()] = curNode;
+					adjacent.setgCost(tentativeGCost);
 					if(!openList.contains(adjacent)){
 						openList.add(adjacent);
 					}
