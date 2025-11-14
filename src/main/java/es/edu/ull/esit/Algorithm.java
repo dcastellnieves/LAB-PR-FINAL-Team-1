@@ -1,3 +1,5 @@
+package es.edu.ull.esit;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;

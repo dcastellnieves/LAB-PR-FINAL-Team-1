@@ -1,3 +1,4 @@
+package es.edu.ull.esit;
 
 import java.awt.Canvas;
 import java.awt.Color;

@@ -1,3 +1,5 @@
+package es.edu.ull.esit;
+
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import java.awt.Color;
