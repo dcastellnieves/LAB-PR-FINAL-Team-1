@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 
@@ -270,5 +272,85 @@ class MainTest {
         assertTrue(node30.isEnd());
         assertFalse(node20.isEnd()); // Previous should be cleared
         assertEquals(node30, targetField.get(null));
+    }
+
+    @Test
+    void testSetupMenu() {
+        // Use JPanel as a container to avoid HeadlessException
+        JPanel panel = new JPanel();
+        Main.SetupMenu(panel);
+        
+        // Verify JMenuBar was added
+        boolean menuBarFound = false;
+        JMenuBar menuBar = null;
+        for (Component c : panel.getComponents()) {
+            if (c instanceof JMenuBar) {
+                menuBarFound = true;
+                menuBar = (JMenuBar) c;
+                break;
+            }
+        }
+        assertTrue(menuBarFound, "MenuBar should be added to the container");
+        
+        // Verify Menus
+        assertEquals(3, menuBar.getMenuCount());
+        assertEquals("File", menuBar.getMenu(0).getText());
+        assertEquals("Board", menuBar.getMenu(1).getText());
+        assertEquals("Algorithms", menuBar.getMenu(2).getText());
+        
+        // Verify Menu Items in "Board"
+        JMenu boardMenu = menuBar.getMenu(1);
+        assertEquals(3, boardMenu.getItemCount());
+        assertEquals("New Board", boardMenu.getItem(0).getText());
+        assertEquals("Generate Maze", boardMenu.getItem(1).getText());
+        assertEquals("Clear Search Results", boardMenu.getItem(2).getText());
+        
+        // Verify Menu Items in "Algorithms"
+        JMenu algoMenu = menuBar.getMenu(2);
+        assertEquals(7, algoMenu.getItemCount()); // BFS, DFS, A*, Dijkstra, Greedy, Bidirectional, SearchTime
+        
+        // Trigger actions to ensure no exceptions (logic is mostly in Main, but listeners are anonymous)
+        // We can't easily check the side effects without mocking, but we can ensure they run.
+        // For example, "New Board" calls createNodes(false).
+        
+        // New Board
+        JMenuItem newBoardItem = boardMenu.getItem(0);
+        ActionListener[] listeners = newBoardItem.getActionListeners();
+        assertTrue(listeners.length > 0);
+        listeners[0].actionPerformed(new ActionEvent(newBoardItem, ActionEvent.ACTION_PERFORMED, "New Board"));
+        
+        // Generate Maze
+        JMenuItem genMazeItem = boardMenu.getItem(1);
+        listeners = genMazeItem.getActionListeners();
+        assertTrue(listeners.length > 0);
+        // This triggers maze generation which might take time or use random, but should be safe
+        listeners[0].actionPerformed(new ActionEvent(genMazeItem, ActionEvent.ACTION_PERFORMED, "Generate Maze"));
+        
+        // Clear Search Results
+        JMenuItem clearItem = boardMenu.getItem(2);
+        listeners = clearItem.getActionListeners();
+        assertTrue(listeners.length > 0);
+        listeners[0].actionPerformed(new ActionEvent(clearItem, ActionEvent.ACTION_PERFORMED, "Clear Search Results"));
+    }
+
+    @Test
+    void testInit() {
+        // init() calls requestFocus(), addMouseListener(), createNodes(), setMazeDirections()
+        // We can verify the state after init()
+        mainApp.init();
+        
+        // Check MouseListeners
+        MouseListener[] listeners = mainApp.getMouseListeners();
+        boolean foundSelf = false;
+        for (MouseListener l : listeners) {
+            if (l == mainApp) {
+                foundSelf = true;
+                break;
+            }
+        }
+        assertTrue(foundSelf, "Main should add itself as MouseListener");
+        
+        // Check nodes created (already checked in setUp, but init re-does it)
+        assertNotNull(mainApp.getNodeAt(15, 15));
     }
 }

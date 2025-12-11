@@ -184,4 +184,24 @@ public class NodeTest {
         assertFalse(neighbours.contains(blocked));
     }
 
+    /**
+     * Prueba el método render de Node.
+     * Se utiliza un BufferedImage para simular el contexto gráfico.
+     */
+    @Test
+    public void testRender() {
+        Node n = new Node(15, 15);
+        n.setColor(Color.BLUE);
+        
+        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(100, 100, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D g2d = image.createGraphics();
+        
+        // Ejecutar render
+        n.render(g2d);
+        
+        g2d.dispose();
+        // No podemos verificar fácilmente los píxeles dibujados sin lógica compleja,
+        // pero aseguramos que no lance excepciones.
+    }
+
 }
