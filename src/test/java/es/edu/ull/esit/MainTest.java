@@ -498,26 +498,6 @@ class MainTest {
     }
 
     @Test
-    void testGetStart() throws Exception {
-        // Access private method getStart
-        java.lang.reflect.Method getStartMethod = Main.class.getDeclaredMethod("getStart");
-        getStartMethod.setAccessible(true);
-        
-        // Case 1: Start is set in the grid
-        mainApp.createNodes(false);
-        Node n = mainApp.getNodeAt(15, 15);
-        n.setColor(Color.GREEN); // isStart() checks for Color.GREEN
-        
-        Node result = (Node) getStartMethod.invoke(mainApp);
-        assertEquals(n, result);
-        
-        // Case 2: No start node
-        n.setColor(Color.LIGHT_GRAY);
-        result = (Node) getStartMethod.invoke(mainApp);
-        assertNull(result);
-    }
-
-    @Test
     void testMainMethod() {
         // Attempt to run main method. It might fail with HeadlessException in CI,
         // but running it covers the lines until the exception.
@@ -553,23 +533,9 @@ class MainTest {
         assertNotNull(mainApp.getNodeAt(15, 15));
         
         // 2. Invalid Negative indices
-        // x=0 -> (0-15)/35 = 0 (integer division) ... wait. -15/35 is 0 in Java? No.
-        // -15 / 35 = 0. 
-        // Let's check logic: x -= 15; x /= 35;
-        // If input is 0: 0 - 15 = -15. -15 / 35 = 0. So index 0.
-        // If input is 14: 14 - 15 = -1. -1 / 35 = 0.
-        // If input is 10: 10 - 15 = -5. -5 / 35 = 0.
-        // Wait, integer division truncates towards zero.
-        // So -15/35 is 0.
-        // To get negative index, we need x < -19 (since -20 - 15 = -35 -> -1).
-        // But let's try clearly invalid negative pixels.
-        
-        // If I pass -50: -50 - 15 = -65. -65 / 35 = -1. Should return null.
         assertNull(mainApp.getNodeAt(-50, -50));
         
         // 3. Invalid Too Large
-        // Grid size is usually defined by window size.
-        // Let's try very large coordinates.
         assertNull(mainApp.getNodeAt(10000, 10000));
     }
 }

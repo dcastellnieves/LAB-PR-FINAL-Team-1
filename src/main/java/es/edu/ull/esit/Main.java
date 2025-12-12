@@ -497,18 +497,6 @@ public class Main extends Canvas implements Runnable, MouseListener {
 	 * Finds and returns the start node in the grid.
 	 * 
 	 * @return The start node, or null if not found
-	 */
-	private Node getStart() {
-		for (int i = 0; i < nodeList.length; i++) {
-			for (int j = 0; j < nodeList[i].length; j++) {
-				if (nodeList[i][j].isStart()) {
-					return nodeList[i][j];
-				}
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * Gets the node at the specified pixel coordinates.
 	 * 
