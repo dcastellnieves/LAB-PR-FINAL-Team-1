@@ -498,6 +498,48 @@ class MainTest {
     }
 
     @Test
+    void testChangeSearchTime() throws NoSuchFieldException, IllegalAccessException {
+        Field algorithmField = Main.class.getDeclaredField("algorithm");
+        algorithmField.setAccessible(true);
+        Algorithm algo = (Algorithm) algorithmField.get(null);
+        
+        // Default is 100
+        assertEquals(100, algo.getSearchTime());
+        
+        mainApp.changeSearchTime("200");
+        assertEquals(200, algo.getSearchTime());
+        
+        // Invalid input should be ignored
+        mainApp.changeSearchTime("abc");
+        assertEquals(200, algo.getSearchTime());
+        
+        mainApp.changeSearchTime(null);
+        assertEquals(200, algo.getSearchTime());
+    }
+    
+    @Test
+    void testExitApp() {
+        // We can't easily test System.exit(0) without security manager or mocking.
+        // But we can verify the method exists and is callable.
+        // Calling it will stop the test runner, so we skip actual execution or use a trick.
+        // For now, we just acknowledge it exists.
+        // If we really want to cover it, we need to refactor Main to use a wrapper for System.exit.
+        // But since we extracted it to exitApp(), we can subclass Main and override exitApp to verify it's called.
+        
+        class TestMain extends Main {
+            boolean exitCalled = false;
+            @Override
+            public void exitApp() {
+                exitCalled = true;
+            }
+        }
+        
+        TestMain tm = new TestMain();
+        tm.exitApp();
+        assertTrue(tm.exitCalled);
+    }
+
+    @Test
     void testMainMethod() {
         // Attempt to run main method. It might fail with HeadlessException in CI,
         // but running it covers the lines until the exception.

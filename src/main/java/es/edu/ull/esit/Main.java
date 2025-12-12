@@ -139,7 +139,7 @@ public class Main extends Canvas implements Runnable, MouseListener {
 		});
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.exit(0);
+				runTimeMain.exitApp();
 			}
 		});
 		newGrid.addActionListener(new ActionListener() {
@@ -195,7 +195,7 @@ public class Main extends Canvas implements Runnable, MouseListener {
 		searchTime.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String input = JOptionPane.showInputDialog(null, "Enter a time it takes to search each node in miliseconds(default = 100ms) ", "Search Time", JOptionPane.QUESTION_MESSAGE);
-				algorithm.setSearchTime(Integer.parseInt(input));
+				runTimeMain.changeSearchTime(input);
 			}
 		});
 
@@ -604,6 +604,20 @@ public class Main extends Canvas implements Runnable, MouseListener {
             resetCosts();
             algorithm.setStrategy(new BidirectionalSearchAlgorithm());
             algorithm.performSearch(start, target, NODES_WIDTH, NODES_HEIGHT);
+        }
+    }
+    
+    public void exitApp() {
+        System.exit(0);
+    }
+
+    public void changeSearchTime(String input) {
+        if (input != null && !input.isEmpty()) {
+            try {
+                algorithm.setSearchTime(Integer.parseInt(input));
+            } catch (NumberFormatException e) {
+                // Ignore invalid input
+            }
         }
     }
     
