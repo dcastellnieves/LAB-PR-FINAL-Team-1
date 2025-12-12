@@ -76,6 +76,23 @@ public class NodeTest {
     }
 
     /**
+     * Verifica que el método estático distance() maneje correctamente
+     * valores que causarían desbordamiento de entero en la resta.
+     */
+    @Test
+    public void testDistanceOverflow() {
+        Node a = new Node();
+        a.setX(Integer.MIN_VALUE).setY(0);
+        Node b = new Node();
+        b.setX(Integer.MAX_VALUE).setY(0);
+        
+        // La distancia debería ser (double)MAX - (double)MIN
+        // 2147483647.0 - (-2147483648.0) = 4294967295.0
+        double expected = (double)Integer.MAX_VALUE - (double)Integer.MIN_VALUE;
+        assertEquals(expected, Node.distance(a, b), 0.001);
+    }
+
+    /**
      * Prueba que el método Clicked() cambie el color del nodo
      * dependiendo del código de botón recibido.
      */
