@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  # Permite ejecutar el workflow manualmente desde "Actions" en GitHub
+  # Allow manual execution from GitHub Actions
   workflow_dispatch:
 
 jobs:
@@ -12,25 +12,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Extrae el código fuente del repositorio
+    # Checkout the repository code
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Configura Maven (usa la versión de Maven adecuada a tu proyecto)
+    # Set up Java and Maven
     - name: Setup Java and Maven
       uses: actions/setup-java@v3
       with:
-        java-version: '17' # Usa '11' o la versión compatible con tu proyecto
+        java-version: '17' # Adjust to your project's Java version
         distribution: 'temurin'
 
-    # Instala OWASP Dependency-Check
+    # Download and setup OWASP Dependency-Check
     - name: Download OWASP Dependency-Check
       run: |
         curl -LO https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
         unzip dependency-check-8.4.0-release.zip -d dependency-check
         chmod +x dependency-check/bin/dependency-check.sh
 
-    # Ejecuta OWASP Dependency-Check
+    # Run OWASP Dependency-Check
     - name: Run Dependency-Check
       run: |
         ./dependency-check/bin/dependency-check.sh \
@@ -39,9 +39,9 @@ jobs:
           --format "HTML" \
           --out "$(pwd)/dependency-check-report"
 
-    # Sube el reporte como artefacto para consultar vulnerabilidades
+    # Upload the Dependency-Check report as an artifact
     - name: Upload Dependency-Check report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: dependency-check-report
         path: dependency-check-report
