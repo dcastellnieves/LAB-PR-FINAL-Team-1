@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  # Allow manual execution from GitHub Actions
   workflow_dispatch:
 
 jobs:
@@ -19,15 +18,21 @@ jobs:
     # Run OWASP Dependency-Check using Docker
     - name: Run OWASP Dependency-Check
       run: |
+        DATA_DIR="dc-data-$GITHUB_RUN_ID"
+        mkdir -p "$DATA_DIR"
         docker run --rm \
           --volume "$(pwd):/src" \
-          --volume "$(pwd)/dc-data:/usr/share/dependency-check/data" \
+          --volume "$(pwd)/$DATA_DIR:/usr/share/dependency-check/data" \
           --volume "$(pwd)/dc-reports:/report" \
           owasp/dependency-check:latest \
           --scan /src \
           --format "ALL" \
           --project "Maven Project" \
           --out /report
+    
+    # Cleanup temporary data directory
+    - name: Cleanup
+      run: rm -rf "dc-data-$GITHUB_RUN_ID"
 
     # Upload the Dependency-Check report as an artifact
     - name: Upload Dependency-Check report
