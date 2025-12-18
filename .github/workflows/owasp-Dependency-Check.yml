@@ -12,36 +12,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository code
+    # Checkout repository code
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Set up Java and Maven
-    - name: Setup Java and Maven
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17' # Adjust to your project's Java version
-        distribution: 'temurin'
-
-    # Download and setup OWASP Dependency-Check
-    - name: Download OWASP Dependency-Check
+    # Run OWASP Dependency-Check using Docker
+    - name: Run OWASP Dependency-Check
       run: |
-        curl -LO https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip
-        unzip dependency-check-8.4.0-release.zip -d dependency-check
-        chmod +x dependency-check/bin/dependency-check.sh
-
-    # Run OWASP Dependency-Check
-    - name: Run Dependency-Check
-      run: |
-        ./dependency-check/bin/dependency-check.sh \
+        docker run --rm \
+          --volume "$(pwd):/src" \
+          --volume "$(pwd)/dc-data:/usr/share/dependency-check/data" \
+          --volume "$(pwd)/dc-reports:/report" \
+          owasp/dependency-check:latest \
+          --scan /src \
+          --format "ALL" \
           --project "Maven Project" \
-          --scan "$(pwd)" \
-          --format "HTML" \
-          --out "$(pwd)/dependency-check-report"
+          --out /report
 
     # Upload the Dependency-Check report as an artifact
     - name: Upload Dependency-Check report
       uses: actions/upload-artifact@v4
       with:
         name: dependency-check-report
-        path: dependency-check-report
+        path: dc-reports
